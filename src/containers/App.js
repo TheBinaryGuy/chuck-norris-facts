@@ -15,15 +15,20 @@ class App extends Component {
       isLoading: false,
       error: ''
     };
+    this.baseurl = 'https://api.chucknorris.io/';
     this.onCategoryClick = this.onCategoryClick.bind(this);
     this.onRandomClick = this.onRandomClick.bind(this);
   }
 
   componentDidMount() {
-    fetch('https://api.chucknorris.io/jokes/categories')
-    .then(res => res.json())
+    let url = this.baseurl + 'jokes/categories';
+    this.fetchData(url)
     .then(data => this.setState({categories: data}))
     .catch(error => this.setState({ hasError: true, error: error }));
+    // fetch('https://api.chucknorris.io/jokes/categories')
+    // .then(res => res.json())
+    // .then(data => this.setState({categories: data}))
+    // .catch(error => this.setState({ hasError: true, error: error }));
   }
 
   componentDidCatch(error, info) {
@@ -31,19 +36,42 @@ class App extends Component {
   }
 
   onCategoryClick(event) {
-    fetch(`https://api.chucknorris.io/jokes/random?category=${event.target.textContent}`)
-    .then(res => res.json())
-    .then(data => this.setState({ categorisedFact: data, fact: undefined }));
+    let url = this.baseurl + `jokes/random?category=${event.target.textContent}`;
+    this.fetchData(url)
+    .then(data => this.setState({ categorisedFact: data, fact: undefined }))
+    .catch(error => this.setState({ hasError: true, error: error }));
+    // fetch(`https://api.chucknorris.io/jokes/random?category=${event.target.textContent}`)
+    // .then(res => res.json())
+    // .then(data => this.setState({ categorisedFact: data, fact: undefined }));
   }
 
   onRandomClick() {
-    fetch(`https://api.chucknorris.io/jokes/random`)
-    .then(res => res.json())
-    .then(data => this.setState({ fact: data, categorisedFact: undefined }));
+    let url = this.baseurl + 'jokes/random';
+    this.fetchData(url)
+    .then(data => this.setState({ fact: data, categorisedFact: undefined }))
+    .catch(error => this.setState({ hasError: true, error: error }));
+    // fetch(`https://api.chucknorris.io/jokes/random`)
+    // .then(res => res.json())
+    // .then(data => this.setState({ fact: data, categorisedFact: undefined }));
+  }
+
+  async fetchData(url) {
+    const res = await fetch(url);
+    return res.json();
   }
 
   render() {
-    return this.state.hasError ? <h1 style={{ textAlign: 'center' }}>Something went wrong!</h1> : (
+    return this.state.hasError ? 
+    (
+      <div>
+        <h1 style={{ textAlign: 'center' }}>You are clicking faster than we can keep up, calm down!</h1>
+        <div style={{ textAlign: 'center' }}>
+          <a href="/" style={{ color: 'slateblue', textDecoration: 'none' }}>&lt;&lt; Go Back</a>
+        </div>
+      </div>
+    )
+    : 
+    (
       <div>
         <h1>Chuck Norris Facts!</h1>
         <button id="random" onClick={this.onRandomClick}>Random Fact</button>
